@@ -1,17 +1,21 @@
+import 'package:dr_jaundice/core/profile_bloc/profile_bloc.dart';
 import 'package:dr_jaundice/features/home/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final SharedPreferences prefs;
 
-  // This widget is the root of your application.
+  const MyApp({super.key, required this.prefs});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,7 +39,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: BlocProvider(
+        create: (context) => ProfileBloc(prefs: prefs)..add(LoadProfile()),
+        child: const HomePage(),
+      ),
     );
   }
 }
