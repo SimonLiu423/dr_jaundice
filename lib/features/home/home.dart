@@ -35,6 +35,14 @@ class HomePage extends StatelessWidget {
               Text('180時（7日12時）'),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.girl, size: 50),
+              onPressed: () {
+                // Add menu action here
+              },
+            ),
+          ],
         ),
         body: Column(
           children: [
