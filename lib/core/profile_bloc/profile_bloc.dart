@@ -12,6 +12,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc({required this.prefs}) : super(ProfileInitial()) {
     on<SaveProfile>(_onSaveProfile);
     on<LoadProfile>(_onLoadProfile);
+    on<DeleteProfile>(_onDeleteProfile);
   }
 
   final SharedPreferences prefs;
@@ -31,5 +32,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
     final profile = Profile.fromJson(jsonDecode(profileJson));
     emit(ProfileLoaded(profile));
+  }
+
+  Future<void> _onDeleteProfile(
+      DeleteProfile event, Emitter<ProfileState> emit) async {
+    await prefs.remove('profile');
+    emit(ProfileRequired());
   }
 }

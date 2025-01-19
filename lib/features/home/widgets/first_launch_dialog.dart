@@ -16,6 +16,7 @@ class _FirstLaunchDialogState extends State<FirstLaunchDialog> {
   final _weightController = TextEditingController();
   final _gestationalWeekController = TextEditingController();
   DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   bool _isMale = true; // Add gender state
 
   @override
@@ -69,7 +70,7 @@ class _FirstLaunchDialogState extends State<FirstLaunchDialog> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '體重';
+                    return '請輸入體重';
                   }
                   if (double.tryParse(value) == null) {
                     return '請輸入正確的體重';
@@ -81,7 +82,10 @@ class _FirstLaunchDialogState extends State<FirstLaunchDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('性別'),
+                  const Text(
+                    '性別',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   Switch(
                     value: _isMale,
                     onChanged: (value) {
@@ -99,25 +103,71 @@ class _FirstLaunchDialogState extends State<FirstLaunchDialog> {
                   ),
                 ],
               ),
-              ListTile(
-                title: Text(_selectedDate == null
-                    ? '生年月日を選択'
-                    : '生年月日: ${_selectedDate!.year}/${_selectedDate!.month}/${_selectedDate!.day}'),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '生日',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(_selectedDate == null
+                      ? '尚未設定'
+                      : '${_selectedDate!.year}/${_selectedDate!.month}/${_selectedDate!.day}'),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      backgroundColor: Colors.orangeAccent.shade200,
+                      foregroundColor: Colors.blueGrey,
+                    ),
+                    onPressed: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate:
+                            DateTime.now().subtract(const Duration(days: 365)),
+                        lastDate: DateTime.now(),
+                      );
+                      if (date != null) {
+                        setState(() {
+                          _selectedDate = date;
+                        });
+                      }
+                    },
+                    child: const Text('選擇'),
+                    // child: const Icon(Icons.calendar_today),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '生時',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(_selectedTime == null
+                      ? '尚未設定'
+                      : _selectedTime!.format(context)),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      backgroundColor: Colors.orangeAccent.shade200,
+                      foregroundColor: Colors.blueGrey,
+                    ),
+                    onPressed: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        setState(() {
+                          _selectedTime = time;
+                        });
+                      }
+                    },
+                    child: const Text('選擇'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -126,12 +176,15 @@ class _FirstLaunchDialogState extends State<FirstLaunchDialog> {
       actions: [
         ElevatedButton(
           onPressed: () {
-            if (_formKey.currentState!.validate() && _selectedDate != null) {
+            if (_formKey.currentState!.validate() &&
+                _selectedDate != null &&
+                _selectedTime != null) {
               context.read<ProfileBloc>().add(
                     SaveProfile(
                       Profile(
                         name: _nameController.text,
                         birthDate: _selectedDate!,
+                        birthTime: _selectedTime!,
                         weight: double.parse(_weightController.text),
                         gender: _isMale ? 'male' : 'female',
                         gestationalWeek:
@@ -139,6 +192,7 @@ class _FirstLaunchDialogState extends State<FirstLaunchDialog> {
                       ),
                     ),
                   );
+              Navigator.pop(context);
             }
           },
           child: const Text('保存'),

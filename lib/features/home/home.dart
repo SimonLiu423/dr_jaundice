@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dr_jaundice/core/profile_bloc/profile_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -14,9 +16,11 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Remove splash screen after screen is loaded
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Remove splash screen after screen is loaded
       FlutterNativeSplash.remove();
+      // Uncomment the following line to test the app as a new user who hasn't filled out their profile yet
+      // context.read<ProfileBloc>().add(DeleteProfile());
     });
 
     return BlocConsumer<ProfileBloc, ProfileState>(
@@ -25,8 +29,15 @@ class HomePage extends StatelessWidget {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => const FirstLaunchDialog(),
+            builder: (_) => BlocProvider.value(
+              value: context.read<ProfileBloc>(),
+              child: const FirstLaunchDialog(),
+            ),
           );
+        }
+        // TODO: remove this after testing
+        if (state is ProfileLoaded) {
+          log('ProfileLoaded ${state.profile.toJson()}');
         }
       },
       builder: (context, state) {

@@ -10,3 +10,5 @@ class SaveProfile extends ProfileEvent {
 }
 
 class LoadProfile extends ProfileEvent {}
+
+class DeleteProfile extends ProfileEvent {}
