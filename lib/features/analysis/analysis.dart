@@ -2,26 +2,22 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'bloc/analysis_bloc.dart';
 
 class AnalysisPage extends StatelessWidget {
+  AnalysisPage({super.key, this.image});
+
   final File? image;
   final _picker = ImagePicker();
-
-  AnalysisPage({super.key, this.image});
+  final _bloc = AnalysisBloc();
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AnalysisPage(
-              image: File(pickedFile.path),
-            ),
-          ),
-        );
+        _bloc.add(LoadImage(image: File(pickedFile.path)));
       }
     } catch (e) {
       log('Error picking image: $e');
@@ -33,7 +29,7 @@ class AnalysisPage extends StatelessWidget {
           errorMessage = '相簿權限已被拒絕，請至設定開啟權限';
         }
       }
-      
+
       if (context.mounted) {
         showDialog(
           context: context,
@@ -54,82 +50,83 @@ class AnalysisPage extends StatelessWidget {
 
   Widget _buildAnalysisView(BuildContext context) {
     return Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Expanded(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Expanded(
           child: Image.file(
-            image!,
+            context.read<AnalysisBloc>().image!,
             fit: BoxFit.contain,
           ),
         ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final buttonWidth =
-                      (constraints.maxWidth - 30) / 5; // Account for padding
-                  final iconSize =
-                      buttonWidth * 0.9; // Slightly smaller than container
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                        iconSize: buttonWidth,
-                        icon: Image.asset(
-                          'assets/images/n_home.png',
-                          height: iconSize,
-                        ),
-                        onPressed: () {
-                          log('home pressed');
-                        },
-                      ),
-                      IconButton(
-                        iconSize: buttonWidth,
-                        icon: Image.asset(
-                          'assets/images/n_rotate.png',
-                          height: iconSize,
-                        ),
-                        onPressed: () {
-                          log('rotate pressed');
-                        },
-                      ),
-                      IconButton(
-                        iconSize: buttonWidth,
-                        icon: Image.asset(
-                          'assets/images/n_analysis.png',
-                          height: iconSize,
-                        ),
-                        onPressed: () {
-                          log('analysis pressed');
-                        },
-                      ),
-                      IconButton(
-                        iconSize: buttonWidth,
-                        icon: Image.asset(
-                          'assets/images/n_result.png',
-                          height: iconSize,
-                        ),
-                        onPressed: () {
-                          log('result pressed');
-                        },
-                      ),
-                      IconButton(
-                        iconSize: buttonWidth,
-                        icon: Image.asset(
-                          'assets/images/n_reset1.png',
-                          height: iconSize,
-                        ),
-                        onPressed: () {
-                          log('reset pressed');
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        );
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final buttonWidth =
+                  (constraints.maxWidth - 30) / 5; // Account for padding
+              final iconSize =
+                  buttonWidth * 0.9; // Slightly smaller than container
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    iconSize: buttonWidth,
+                    icon: Image.asset(
+                      'assets/images/n_home.png',
+                      height: iconSize,
+                    ),
+                    onPressed: () {
+                      log('home pressed');
+                    },
+                  ),
+                  IconButton(
+                    iconSize: buttonWidth,
+                    icon: Image.asset(
+                      'assets/images/n_rotate.png',
+                      height: iconSize,
+                    ),
+                    onPressed: () {
+                      log('rotate pressed');
+                    },
+                  ),
+                  IconButton(
+                    iconSize: buttonWidth,
+                    icon: Image.asset(
+                      'assets/images/n_analysis.png',
+                      height: iconSize,
+                    ),
+                    onPressed: () {
+                      log('analysis pressed');
+                      _bloc.add(StartAnalysis());
+                    },
+                  ),
+                  IconButton(
+                    iconSize: buttonWidth,
+                    icon: Image.asset(
+                      'assets/images/n_result.png',
+                      height: iconSize,
+                    ),
+                    onPressed: () {
+                      log('result pressed');
+                    },
+                  ),
+                  IconButton(
+                    iconSize: buttonWidth,
+                    icon: Image.asset(
+                      'assets/images/n_reset1.png',
+                      height: iconSize,
+                    ),
+                    onPressed: () {
+                      log('reset pressed');
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildImageSelectionView(BuildContext context) {
@@ -184,23 +181,70 @@ class AnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/n_background1.png'),
-          fit: BoxFit.cover,
-          opacity: 1,
+    if (image != null) {
+      _bloc.add(LoadImage(image: image!));
+    }
+    return BlocProvider(
+      create: (context) => _bloc,
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/n_background1.png'),
+            fit: BoxFit.cover,
+            opacity: 1,
+          ),
         ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          title: const Text('黃疸分析'),
+        child: BlocConsumer<AnalysisBloc, AnalysisState>(
+          listener: (context, state) {
+            if (state is AnalysisLoaded) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('分析結果'),
+                  content: Text(state.result),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            return Stack(
+              children: [
+                Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: AppBar(
+                    backgroundColor: Colors.transparent,
+                    title: const Text('黃疸分析'),
+                  ),
+                  body: state is AnalysisInitial
+                      ? _buildImageSelectionView(context)
+                      : _buildAnalysisView(context),
+                ),
+                if (state is AnalysisLoading)
+                  Container(
+                    color: Colors.black54,
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            '分析中...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
-        body: image != null
-            ? _buildAnalysisView(context)
-            : _buildImageSelectionView(context),
       ),
     );
   }
