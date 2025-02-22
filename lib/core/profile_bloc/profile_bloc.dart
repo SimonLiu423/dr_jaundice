@@ -16,11 +16,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   final SharedPreferences prefs;
+  Profile? profile;
 
   Future<void> _onSaveProfile(
       SaveProfile event, Emitter<ProfileState> emit) async {
+    profile = event.profile;
     await prefs.setString('profile', jsonEncode(event.profile.toJson()));
-    emit(ProfileLoaded(event.profile));
+    emit(ProfileLoaded());
   }
 
   Future<void> _onLoadProfile(
@@ -30,13 +32,14 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileRequired());
       return;
     }
-    final profile = Profile.fromJson(jsonDecode(profileJson));
-    emit(ProfileLoaded(profile));
+    profile = Profile.fromJson(jsonDecode(profileJson));
+    emit(ProfileLoaded());
   }
 
   Future<void> _onDeleteProfile(
       DeleteProfile event, Emitter<ProfileState> emit) async {
     await prefs.remove('profile');
+    profile = null;
     emit(ProfileRequired());
   }
 }

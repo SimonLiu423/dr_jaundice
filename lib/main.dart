@@ -1,20 +1,18 @@
 import 'package:dr_jaundice/core/profile_bloc/profile_bloc.dart';
 import 'package:dr_jaundice/features/home/home.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/getit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
+  setupGetIt();
 
-  runApp(MyApp(prefs: prefs));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final SharedPreferences prefs;
-
-  const MyApp({super.key, required this.prefs});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: BlocProvider(
-        create: (context) => ProfileBloc(prefs: prefs)..add(LoadProfile()),
+        create: (context) => sl<ProfileBloc>()..add(LoadProfile()),
         child: const HomePage(),
       ),
     );

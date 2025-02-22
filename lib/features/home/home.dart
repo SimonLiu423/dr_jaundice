@@ -31,13 +31,13 @@ class HomePage extends StatelessWidget {
             barrierDismissible: false,
             builder: (_) => BlocProvider.value(
               value: context.read<ProfileBloc>(),
-              child: const FirstLaunchDialog(),
+              child: const ProfileEditDialog(),
             ),
           );
         }
         // TODO: remove this after testing
         if (state is ProfileLoaded) {
-          log('ProfileLoaded ${state.profile.toJson()}');
+          log('ProfileLoaded ${context.read<ProfileBloc>().profile?.toJson()}');
         }
       },
       builder: (context, state) {
