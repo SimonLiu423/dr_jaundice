@@ -47,5 +47,9 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSCameraUsageDescription</key>
+		<string>需要相機權限來拍攝黃疸照片</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>需要相簿權限來選擇黃疸照片</string>
 	</dict>
 </plist>
