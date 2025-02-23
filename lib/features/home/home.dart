@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dr_jaundice/core/profile_bloc/profile_bloc.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,10 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:dr_jaundice/features/analysis/analysis.dart';
 import 'package:dr_jaundice/features/history/history.dart';
 import 'package:dr_jaundice/features/profile/profile.dart';
-import 'package:dr_jaundice/features/take_picture/take_picture.dart';
 import 'package:dr_jaundice/features/home/widgets/round_image_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dr_jaundice/features/home/widgets/first_launch_dialog.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -94,6 +95,8 @@ class HomePage extends StatelessWidget {
 class _HomeButtons extends StatelessWidget {
   static const double buttonSize = 150;
 
+  final _picker = ImagePicker();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -135,13 +138,18 @@ class _HomeButtons extends StatelessWidget {
             RoundImageButton(
               image: 'assets/images/n_taking_picture.png',
               size: buttonSize,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TakePicturePage(),
-                  ),
-                );
+              onTap: () async {
+                final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                if (pickedFile != null) {
+                  if (context.mounted) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AnalysisPage(image: File(pickedFile.path)),
+                      ),
+                    );
+                  }
+                }
               },
             ),
             RoundImageButton(
