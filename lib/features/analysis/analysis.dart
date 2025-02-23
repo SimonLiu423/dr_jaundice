@@ -6,12 +6,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'bloc/analysis_bloc.dart';
 
-class AnalysisPage extends StatelessWidget {
-  AnalysisPage({super.key, this.image});
+class AnalysisPage extends StatefulWidget {
+  const AnalysisPage({super.key, this.image});
 
   final File? image;
+
+  @override
+  State<AnalysisPage> createState() => _AnalysisPageState();
+}
+
+class _AnalysisPageState extends State<AnalysisPage> {
   final _picker = ImagePicker();
+
   final _bloc = AnalysisBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.image != null) {
+      _bloc.add(LoadImage(image: widget.image!));
+    }
+  }
 
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
     try {
@@ -181,9 +196,6 @@ class AnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (image != null) {
-      _bloc.add(LoadImage(image: image!));
-    }
     return BlocProvider(
       create: (context) => _bloc,
       child: Container(
