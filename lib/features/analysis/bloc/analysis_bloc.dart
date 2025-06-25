@@ -3,6 +3,7 @@ import '../../../core/constants.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 part 'analysis_event.dart';
 part 'analysis_state.dart';
@@ -28,13 +29,14 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
       StartAnalysis event, Emitter<AnalysisState> emit) async {
     emit(AnalysisLoading());
 
-    // TODO(SimonLiu423): Revise this part when the API is ready
     await Future.delayed(const Duration(seconds: 2));
 
+    // final uuid = await getDeviceUUID();
     // final result = await dio.post(
     //   '$apiUrl/analyze',
     //   data: FormData.fromMap({
     //     'image': MultipartFile.fromFileSync(image!.path),
+    //     'uuid': uuid,
     //   }),
     // );
 
@@ -98,5 +100,17 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
       default:
         return '未知錯誤！\n請重新取像！';
     }
+  }
+
+  Future<String?> getDeviceUUID() async {
+    final deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.id;
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor;
+    }
+    return null;
   }
 }
