@@ -4,7 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
 
-void setupGetIt() async {
-  sl.registerSingleton<SharedPreferences>(await SharedPreferences.getInstance());
-  sl.registerSingleton<ProfileBloc>(ProfileBloc(prefs: sl<SharedPreferences>()));
+Future<void> setupGetIt() async {
+  sl.registerSingleton<SharedPreferences>(
+      await SharedPreferences.getInstance());
+  sl.registerSingleton<ProfileBloc>(
+      ProfileBloc(prefs: sl<SharedPreferences>()));
 }
