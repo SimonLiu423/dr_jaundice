@@ -1,6 +1,0 @@
----
-description: 
-globs: *.dart
----
-# Rules
-- use BLoC to seperate UI and logic.
