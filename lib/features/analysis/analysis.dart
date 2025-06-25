@@ -209,11 +209,31 @@ class _AnalysisPageState extends State<AnalysisPage> {
         child: BlocConsumer<AnalysisBloc, AnalysisState>(
           listener: (context, state) {
             if (state is AnalysisLoaded) {
-              showDialog(
+              showDialog<void>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('分析結果'),
+                  title: const Text('成功'),
                   content: Text(state.result),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('確定'),
+                    ),
+                  ],
+                ),
+              );
+            } else if (state is AnalysisError) {
+              showDialog<void>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('錯誤'),
+                  content: Text(state.message),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('確定'),
+                    ),
+                  ],
                 ),
               );
             }

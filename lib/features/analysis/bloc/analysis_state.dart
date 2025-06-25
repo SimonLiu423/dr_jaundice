@@ -18,3 +18,9 @@ final class ImageLoaded extends AnalysisState {
 
   ImageLoaded({required this.image});
 }
+
+final class AnalysisError extends AnalysisState {
+  final String message;
+
+  AnalysisError({required this.message});
+}
