@@ -16,6 +16,7 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
   final dio = Dio();
   File? image;
   double? jvValue;
+  int? riskNumber;
 
   Future<void> _onLoadImage(
       LoadImage event, Emitter<AnalysisState> emit) async {
@@ -40,6 +41,7 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
     // Simulate a response from backend for demonstration
     final dynamic responseJVValue =
         21.85; // Change this value to test different cases
+    final int responseRiskNumber = 2; // Example: 中高風險
 
     final String? errorMessage = _getErrorMessage(responseJVValue);
     if (errorMessage != null) {
@@ -51,6 +53,7 @@ class AnalysisBloc extends Bloc<AnalysisEvent, AnalysisState> {
     if (responseJVValue is num && responseJVValue >= 0) {
       emit(AnalysisLoaded(result: '處理完成!\nJV = $responseJVValue'));
       jvValue = responseJVValue.toDouble();
+      riskNumber = responseRiskNumber;
       return;
     }
 
